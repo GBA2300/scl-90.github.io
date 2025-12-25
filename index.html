@@ -3,805 +3,1621 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCL-90症状自评量表</title>
-    <!-- 引入Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>恋爱体质测试 - 测测你是什么恋爱型人格？</title>
     <style>
-        /* 全局样式 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #ff6b9d;
+            --secondary-color: #c44569;
+            --accent-color: #ffa502;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --success-color: #00b894;
+            --warning-color: #fdcb6e;
+            --danger-color: #d63031;
         }
 
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景装饰元素 */
+        .bg-decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* 页面样式 */
-        .page {
-            display: none;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-top: 30px;
-        }
-
-        .page.active {
+        /* 首页样式 */
+        .home-page {
             display: block;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .home-page.hidden {
+            display: none;
         }
 
-        h1, h2, h3 {
-            color: #4A90E2;
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 60px;
             margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        p {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 15px;
         }
 
-        /* 按钮样式 */
-        .btn {
-            display: inline-block;
-            background-color: #4A90E2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background-color: #3A80D2;
-        }
-
-        .btn-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        /* 进度条样式 */
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background-color: #e0e0e0;
-            border-radius: 5px;
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1em;
             margin-bottom: 30px;
+        }
+
+        .intro-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .intro-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .intro-section p {
+            color: var(--text-dark);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .start-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
         }
 
-        .progress-bar {
-            height: 100%;
-            background-color: #4A90E2;
-            width: 0%;
-            transition: width 0.3s ease;
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.6);
         }
 
-        /* 题目样式 */
-        .question-container {
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 测试页面样式 */
+        .test-page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .test-page.active {
+            display: block;
+        }
+
+        .test-header {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
             margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .question-number {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 15px;
         }
 
         .question-text {
-            font-size: 18px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            border-left: 4px solid #4A90E2;
+            font-size: 1.3em;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
-        .option {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
+        .option-btn {
+            padding: 18px 25px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
         }
 
-        .option:hover {
-            background-color: #e0e0e0;
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            background: #fff5f8;
+            transform: translateX(5px);
         }
 
-        .option.selected {
-            background-color: #4A90E2;
+        .option-btn.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .option-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: var(--primary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option-btn:hover::before {
+            transform: scaleY(1);
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background: #dfe6e9;
+            color: var(--text-dark);
+        }
+
+        .prev-btn:hover:not(:disabled) {
+            background: #b2bec3;
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
         }
 
-        .option input {
-            margin-right: 10px;
+        .next-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
         }
 
-        /* 导航按钮样式 */
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        /* 结果页样式 */
-        .result-item {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+        /* 结果页面样式 */
+        .result-page {
+            display: none;
+            animation: fadeIn 0.5s ease;
         }
 
-        .result-item h3 {
-            margin-bottom: 10px;
-            color: #333;
+        .result-page.active {
+            display: block;
         }
 
-        .factor-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .result-header {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
         }
 
-        .factor-table th, .factor-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+        .result-score {
+            font-size: 5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            animation: scoreReveal 1s ease;
         }
 
-        .factor-table th {
-            background-color: #f0f0f0;
+        @keyframes scoreReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        .factor-table tr:hover {
-            background-color: #f9f9f9;
+        .result-type {
+            font-size: 2em;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-weight: bold;
         }
 
-        .highlight {
-            background-color: #fff3cd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ffc107;
-        }
-
-        .warning {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 400px;
+        .result-subtitle {
+            color: var(--text-light);
+            font-size: 1.1em;
             margin-bottom: 30px;
         }
 
+        .result-details {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .detail-title {
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-icon {
+            font-size: 1.5em;
+        }
+
+        .detail-content {
+            color: var(--text-dark);
+            line-height: 1.8;
+        }
+
+        .trait-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .trait-tag {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+        }
+
+        .chart-bar {
+            margin-bottom: 15px;
+        }
+
+        .chart-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--text-dark);
+        }
+
+        .chart-bar-bg {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            color: white;
+        }
+
+        .retry-btn {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.8;
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
         /* 响应式设计 */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .result-score {
+                font-size: 3.5em;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
             .container {
                 padding: 10px;
             }
 
-            .page {
-                padding: 20px;
+            h1 {
+                font-size: 1.5em;
             }
 
-            .question-text {
-                font-size: 16px;
+            .logo {
+                font-size: 40px;
             }
 
-            .nav-buttons {
-                flex-direction: column;
-                gap: 10px;
+            .question-card {
+                padding: 25px 20px;
+                min-height: 350px;
             }
 
-            .nav-buttons .btn {
-                width: 100%;
+            .option-btn {
+                padding: 15px 20px;
+                font-size: 0.95em;
             }
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 分享弹窗 */
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .share-modal.active {
+            display: flex;
+        }
+
+        .share-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .share-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .share-link {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .close-modal-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
         }
     </style>
 </head>
 <body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration" id="bgDecoration"></div>
+
     <div class="container">
-        <!-- 引导页 -->
-        <section id="intro" class="page active">
-            <h1>SCL-90症状自评量表</h1>
-            <div class="intro-content">
-                <h2>量表简介</h2>
-                <p>SCL-90（Symptom Checklist-90-Revised）是世界上最著名的心理健康测试量表之一，包含90个项目，涵盖了广泛的心理健康问题。该量表用于评估一个人在最近一周内的心理健康状况，包括躯体化、强迫症状、人际关系敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性等九个维度。</p>
-                
-                <h2>测评须知</h2>
-                <ul>
-                    <li>请评定时间范围为"现在"或"最近一个星期"。</li>
-                    <li>测试预计时间：约15-20分钟。</li>
-                    <li>请根据自己的实际情况如实回答每一个问题。</li>
-                    <li>每个问题后有五个选项，请选择最符合您情况的选项。</li>
-                </ul>
-                
-                <h2>评分标准</h2>
-                <ul>
-                    <li><strong>没有</strong>：表示没有该项症状。</li>
-                    <li><strong>很轻</strong>：表示有该项症状，但影响轻微。</li>
-                    <li><strong>中等</strong>：表示有该项症状，影响明显。</li>
-                    <li><strong>偏重</strong>：表示有该项症状，影响较重。</li>
-                    <li><strong>严重</strong>：表示有该项症状，影响严重。</li>
-                </ul>
-                
-                <div class="highlight">
-                    <p><strong>注意：</strong>本测评结果仅供参考，不能作为专业诊断依据。如有需要，请关注心理健康问题，及时咨询专业心理咨询师或医生。</p>
-                </div>
-                
-                <div class="btn-container">
-                    <button id="start-test" class="btn">开始测试</button>
-                </div>
+        <!-- 首页 -->
+        <div class="home-page" id="homePage">
+            <div class="header">
+                <div class="logo">💕</div>
+                <h1>恋爱体质测试</h1>
+                <p class="subtitle">测测你是什么恋爱型人格？专业又搞笑的恋爱测试！</p>
             </div>
-        </section>
-        
-        <!-- 测试页 -->
-        <section id="test" class="page">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            
-            <div class="question-container">
-                <div class="question-text" id="question-text">题目加载中...</div>
-                
-                <div class="options-container" id="options-container">
-                    <!-- 选项将通过JavaScript动态生成 -->
-                </div>
-            </div>
-            
-            <div class="nav-buttons">
-                <button id="prev-btn" class="btn" disabled>上一题</button>
-                <div id="question-counter">问题 <span id="current-question">1</span>/90</div>
-                <button id="next-btn" class="btn">下一题</button>
-            </div>
-        </section>
-        
-        <!-- 结果页 -->
-        <section id="results" class="page">
-            <h1>SCL-90测评结果</h1>
-            
-            <div class="result-item">
-                <h3>总体评估</h3>
-                <p><strong>总分：</strong><span id="total-score">0</span></p>
-                <p><strong>总症状指数：</strong><span id="total-symptom-index">0</span></p>
-                <p><strong>阳性项目数：</strong><span id="positive-items">0</span> (得分≥2的项目)</p>
-                <p><strong>阴性项目数：</strong><span id="negative-items">0</span> (得分=1的项目)</p>
-            </div>
-            
-            <div class="warning" id="interpretation-warning">
-                <!-- 解释性文字将通过JavaScript动态生成 -->
-            </div>
-            
-            <div class="result-item">
-                <h3>各因子得分</h3>
-                <div class="chart-container">
-                    <canvas id="radar-chart"></canvas>
-                </div>
-                
-                <table class="factor-table" id="factor-table">
-                    <thead>
-                        <tr>
-                            <th>因子名称</th>
-                            <th>平均分</th>
-                            <th>结果解释</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 因子数据将通过JavaScript动态动态生成 -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="result-item">
-                <h3>结果解释</h3>
-                <div id="interpretation">
-                    <!-- 解释性文字将通过JavaScript动态生成 -->
+
+            <div class="intro-section">
+                <h2>🌟 什么是恋爱体质测试？</h2>
+                <p>
+                    恋爱体质测试是通过科学的心理学量表和幽默风趣的题目，深度分析你的恋爱倾向、依恋模式、占有欲程度等多个维度。
+                </p>
+                <p>
+                    <strong>💡 能解决什么问题？</strong><br>
+                    • 了解自己在恋爱中的真实表现<br>
+                    • 发现潜在的恋爱心理模式<br>
+                    • 获得专业的恋爱建议和改善方向<br>
+                    • 看看你是"恋爱脑"还是"人间清醒"
+                </p>
+                <p>
+                    <strong>🎯 为什么要测试？</strong><br>
+                    知己知彼，百恋不殆！了解自己的恋爱体质，才能在感情路上少走弯路，避免"凭实力单身"的尴尬局面！
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <div><strong>专业分析</strong></div>
+                        <small>基于心理学理论</small>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">😂</div>
+                        <div><strong>幽默有趣</strong></div>
+                        <small>网络热梗神评论</small>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div><strong>数据可视化</strong></div>
+                        <small>多维度图表展示</small>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div><strong>快速准确</strong></div>
+                        <small>25题精准测评</small>
+                    </div>
                 </div>
             </div>
-            
-            <div class="warning">
-                <p><strong>专业免责声明：</strong></p>
-                <p>SCL-90是一个筛查工具，其结果不能作为临床诊断的依据。如需专业诊断，请务必咨询精神科医生或专业心理咨询师。</p>
+
+            <button class="start-btn" onclick="startTest()">
+                🚀 开始测试（全程约3分钟）
+            </button>
+        </div>
+
+        <!-- 测试页面 -->
+        <div class="test-page" id="testPage">
+            <div class="test-header">
+                <div class="progress-container">
+                    <div class="progress-text" id="progressText">1/25 题</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 4%"></div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="btn-container">
-                <button id="restart-test" class="btn">重新测试</button>
+
+            <div class="question-card" id="questionCard">
+                <div>
+                    <div class="question-number" id="questionNumber">第1题</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+                <div class="options-container" id="optionsContainer"></div>
             </div>
-        </section>
+
+            <div class="navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="prevQuestion()" disabled>
+                    +一题
+                </button>
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                    下一题 ➡
+                </button>
+            </div>
+        </div>
+
+        <!-- 结果页面 -->
+        <div class="result-page" id="resultPage">
+            <div class="result-header">
+                <div class="result-type" id="resultType"></div>
+                <div class="result-score" id="resultScore">0</div>
+                <div class="result-subtitle" id="resultSubtitle"></div>
+            </div>
+
+            <div class="result-details" id="resultDetails"></div>
+
+            <div class="result-actions">
+                <button class="action-btn share-btn" onclick="shareResult()">
+                    📤 分享结果
+                </button>
+                <button class="action-btn retry-btn" onclick="retryTest()">
+                    🔄 重新测试
+                </button>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>💡 本测试仅供娱乐参考，不作为专业心理诊断依据</p>
+            <p>© 2024 恋爱体质测试 | 让爱更科学，让恋更有趣</p>
+        </div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <h3>🎉 分享你的测试结果</h3>
+            <p>复制下面的链接分享给朋友：</p>
+            <div class="share-link" id="shareLink"></div>
+            <button class="close-modal-btn" onclick="closeShareModal()">关闭</button>
+        </div>
     </div>
 
     <script>
-        // SCL-90题目数据
+        // ==================== 题库数据 ====================
         const questions = [
-            { id: 1, text: "头痛", factor: "躯体化" },
-            { id: 2, text: "神经过敏，心中不踏实", factor: "焦虑" },
-            { id: 3, text: "头脑中有不必要的想法或字句盘旋", factor: "强迫症状" },
-            { id: 4, text: "头晕或昏倒", factor: "躯体化" },
-            { id: 5, text: "对异性的兴趣减退", factor: "抑郁" },
-            { id: 6, text: "对旁人责备求全", factor: "人际关系敏感" },
-            { id: 7, text: "感到别人能控制您的思想", factor: "精神病性" },
-            { id: 8, text: "责怪别人制造麻烦", factor: "偏执" },
-            { id: 9, text: "忘记性大", factor: "强迫症状" },
-            { id: 10, text: "担心自己的衣饰整齐及仪态的端正", factor: "强迫症状" },
-            { id: 11, text: "容易烦恼和激动", factor: "敌对" },
-            { id: 12, text: "胸痛", factor: "躯体化" },
-            { id: 13, text: "害怕空旷的场所或街道", factor: "恐怖" },
-            { id: 14, text: "感到自己的精力下降，活动减慢", factor: "抑郁" },
-            { id: 15, text: "想结束自己的生命", factor: "抑郁" },
-            { id: 16, text: "听到旁人听不到的声音", factor: "精神病性" },
-            { id: 17, text: "发抖", factor: "焦虑" },
-            { id: 18, text: "感到大多数人都不可信任", factor: "偏执" },
-            { id: 19, text: "胃口不好", factor: "其他" },
-            { id: 20, text: "容易哭泣", factor: "抑郁" },
-            { id: 21, text: "同异性相处时感到害羞不自在", factor: "人际关系敏感" },
-            { id: 22, text: "感到受骗，中了圈套或有人想抓住您", factor: "抑郁" },
-            { id: 23, text: "无缘无故地突然感到害怕", factor: "焦虑" },
-            { id: 24, text: "自己不能控制地大发脾气", factor: "敌对" },
-            { id: 25, text: "怕单独出门", factor: "恐怖" },
-            { id: 26, text: "经常责怪自己", factor: "抑郁" },
-            { id: 27, text: "腰痛", factor: "躯体化" },
-            { id: 28, text: "感到难以完成任务", factor: "强迫症状" },
-            { id: 29, text: "感到孤独", factor: "抑郁" },
-            { id: 30, text: "感到苦闷", factor: "抑郁" },
-            { id: 31, text: "过分担忧", factor: "抑郁" },
-            { id: 32, text: "对事物不感兴趣", factor: "抑郁" },
-            { id: 33, text: "感到害怕", factor: "焦虑" },
-            { id: 34, text: "我的感情容易受到伤害", factor: "人际关系敏感" },
-            { id: 35, text: "旁人能知道您的私下想法", factor: "精神病性" },
-            { id: 36, text: "感到别人不理解您、不同情您", factor: "人际关系敏感" },
-            { id: 37, text: "感到人们对您不友好，不喜欢您", factor: "人际关系敏感" },
-            { id: 38, text: "做事必须做得很慢以保证做得正确", factor: "强迫症状" },
-            { id: 39, text: "心跳得很厉害", factor: "焦虑" },
-            { id: 40, text: "恶心或胃部不舒服", factor: "躯体化" },
-            { id: 41, text: "感到比不上他人", factor: "人际关系敏感" },
-            { id: 42, text: "肌肉酸痛", factor: "躯体化" },
-            { id: 43, text: "感到有人在监视您、谈论您", factor: "偏执" },
-            { id: 44, text: "难以入睡", factor: "其他" },
-            { id: 45, text: "做事必须反复检查", factor: "强迫症状" },
-            { id: 46, text: "难以做出决定", factor: "强迫症状" },
-            { id: 47, text: "怕乘电车、公共汽车、地铁或火车", factor: "恐怖" },
-            { id: 48, text: "呼吸有困难", factor: "躯体化" },
-            { id: 49, text: "一阵阵发冷或发热", factor: "躯体化" },
-            { id: 50, text: "因为感到害怕而避开某些东西、场合或活动", factor: "恐怖" },
-            { id: 51, text: "脑子变空了", factor: "强迫症状" },
-            { id: 52, text: "身体发麻或刺痛", factor: "躯体化" },
-            { id: 53, text: "喉咙有梗塞感", factor: "躯体化" },
-            { id: 54, text: "感到前途没有希望", factor: "抑郁" },
-            { id: 55, text: "不能集中注意力", factor: "强迫症状" },
-            { id: 56, text: "感到身体的某一部分软弱无力", factor: "躯体化" },
-            { id: 57, text: "感到紧张或容易紧张", factor: "焦虑" },
-            { id: 58, text: "感到手或脚发重", factor: "躯体化" },
-            { id: 59, text: "想到死亡的事", factor: "其他" },
-            { id: 60, text: "吃得太多", factor: "其他" },
-            { id: 61, text: "当别人看着您或谈论您时感到不自在", factor: "人际关系敏感" },
-            { id: 62, text: "有一些不属于您自己的想法", factor: "精神病性" },
-            { id: 63, text: "有想打人或伤害他人的冲动", factor: "敌对" },
-            { id: 64, text: "醒得太早", factor: "其他" },
-            { id: 65, text: "必须反复洗手、点数目或触摸某些东西", factor: "强迫症状" },
-            { id: 66, text: "睡得不稳不深", factor: "其他" },
-            { id: 67, text: "有想摔坏或破坏东西的冲动", factor: "敌对" },
-            { id: 68, text: "有一些别人没有的想法或念头", factor: "偏执" },
-            { id: 69, text: "感到对别人神经过敏", factor: "人际关系敏感" },
-            { id: 70, text: "在商店或电影院等人多的地方感到不自在", factor: "恐怖" },
-            { id: 71, text: "感到任何事情都很困难", factor: "抑郁" },
-            { id: 72, text: "一阵阵恐惧或惊恐", factor: "焦虑" },
-            { id: 73, text: "感到在公共场合吃东西很不舒服", factor: "人际关系敏感" },
-            { id: 74, text: "经常与人争论", factor: "敌对" },
-            { id: 75, text: "单独一人时神经很紧张", factor: "恐怖" },
-            { id: 76, text: "别人对您的成绩没有做出恰当的评价", factor: "偏执" },
-            { id: 77, text: "即使和别人在一起也感到孤单", factor: "精神病性" },
-            { id: 78, text: "感到坐立不安心神不定", factor: "焦虑" },
-            { id: 79, text: "感到自己没有什么价值", factor: "抑郁" },
-            { id: 80, text: "感到熟悉的东西变成陌生或不像是真的", factor: "焦虑" },
-            { id: 81, text: "大叫或摔东西", factor: "敌对" },
-            { id: 82, text: "害怕会在公共场合昏倒", factor: "恐怖" },
-            { id: 83, text: "感到别人想占您的便宜", factor: "偏执" },
-            { id: 84, text: "为一些有关性的想法而很苦恼", factor: "精神病性" },
-            { id: 85, text: "您认为应该因为自己的过错而受到惩罚", factor: "精神病性" },
-            { id: 86, text: "感到要很快把事情做完", factor: "焦虑" },
-            { id: 87, text: "感到自己的身体有严重问题", factor: "精神病性" },
-            { id: 88, text: "从未感到和其他人很亲近", factor: "精神病性" },
-            { id: 89, text: "感到自己有罪", factor: "其他" },
-            { id: 90, text: "感到自己的脑子有毛病", factor: "精神病性" }
+            {
+                question: "收到喜欢的人消息时，你的第一反应是？",
+                options: [
+                    { text: "秒回！还要加三个感叹号！！！", scores: { attachment: 3, passion: 3, rational: 0 } },
+                    { text: "等几分钟再回，显得我很忙", scores: { attachment: 1, passion: 2, rational: 3 } },
+                    { text: "分析一下ta为什么现在找我", scores: { attachment: 2, passion: 1, rational: 3 } },
+                    { text: "直接打电话过去！", scores: { attachment: 3, passion: 3, rational: 0 } }
+                ]
+            },
+            {
+                question: "约会迟到了，你会怎么解释？",
+                options: [
+                    { text: "对不起宝贝！我刚刚被外星人绑架了！", scores: { humor: 3, sincere: 2, excuse: 3 } },
+                    { text: "路上堵车，真的不是我的错", scores: { humor: 1, sincere: 2, excuse: 2 } },
+                    { text: "我故意晚到的，想让你多想我一会儿", scores: { humor: 2, sincere: 1, dominant: 3 } },
+                    { text: "直接发个520红包道歉", scores: { generous: 3, materialist: 2 } }
+                ]
+            },
+            {
+                question: "发现对象和异性聊天，你的内心戏是？",
+                options: [
+                    { text: "完了完了，我要被绿了！😭", scores: { anxiety: 3, insecure: 3 } },
+                    { text: "关我屁事，我也有我的鱼塘", scores: { independent: 3, casual: 3 } },
+                    { text: "悄悄看一眼聊什么，不被发现", scores: { possessive: 3, curious: 2 } },
+                    { text: "直接问：这是谁？什么关系？", scores: { direct: 3, dominant: 2 } }
+                ]
+            },
+            {
+                question: "选择约会地点，你更倾向于？",
+                options: [
+                    { text: "网红打卡地，要拍照发朋友圈", scores: { social: 3, showoff: 2 } },
+                    { text: "安静的咖啡厅，可以深度聊天", scores: { deep: 3, romantic: 2 } },
+                    { text: "游乐场/密室逃脱，刺激好玩", scores: { adventurous: 3, fun: 3 } },
+                    { text: "对方想去哪就去哪，我都行", scores: { agreeable: 3, passive: 2 } }
+                ]
+            },
+            {
+                question: "恋爱中最不能接受的是？",
+                options: [
+                    { text: "对方不回消息超过2小时", scores: { anxiety: 3, control: 2 } },
+                    { text: "对方和前任还有联系", scores: { jealous: 3, insecure: 2 } },
+                    { text: "对方不让我看手机", scores: { privacy: 3, trust: 2 } },
+                    { text: "对方比我还受欢迎", scores: { competitive: 3, insecure: 1 } }
+                ]
+            },
+            {
+                question: "你会如何表达'我爱你'？",
+                options: [
+                    { text: "每天说100遍！早晚安从不落", scores: { verbal: 3, intense: 3 } },
+                    { text: "默默为ta做很多事，不说出来", scores: { action: 3, silent: 2 } },
+                    { text: "发长篇大论的小作文", scores: { romantic: 3, dramatic: 2 } },
+                    { text: "用实际行动证明，比如买买买", scores: { material: 3, practical: 2 } }
+                ]
+            },
+            {
+                question: "吵架后，你通常？",
+                options: [
+                    { text: "立刻道歉，不管谁对谁错", scores: { peacemaker: 3, submissive: 1 } },
+                    { text: "冷战，等对方先低头", scores: { stubborn: 3, passive: 2 } },
+                    { text: "讲道理，一定要争个明白", scores: { rational: 3, argumentative: 2 } },
+                    { text: "假装没事，过会儿就好了", scores: { avoidant: 3, casual: 2 } }
+                ]
+            },
+            {
+                question: "对于'查岗'这件事，你的态度是？",
+                options: [
+                    { text: "我查对方可以，对方查我不行", scores: { double: 3, dominant: 2 } },
+                    { text: "完全不需要，信任最重要", scores: { trust: 3, independent: 2 } },
+                    { text: "偶尔查一下，保持警惕", scores: { cautious: 3, anxious: 1 } },
+                    { text: "互相查岗才公平", scores: { equal: 3, fair: 2 } }
+                ]
+            },
+            {
+                question: "恋爱多久可以发生亲密关系？",
+                options: [
+                    { text: "第一次见面就可以", scores: { impulsive: 3, casual: 3 } },
+                    { text: "至少3个月，要了解清楚", scores: { cautious: 3, traditional: 2 } },
+                    { text: "等到结婚后", scores: { conservative: 3, religious: 2 } },
+                    { text: "看感觉，感觉对了就行", scores: { intuitive: 3, spontaneous: 2 } }
+                ]
+            },
+            {
+                question: "你理想的恋爱状态是？",
+                options: [
+                    { text: "24小时黏在一起，永不分离", scores: { clingy: 3, intense: 3 } },
+                    { text: "各自忙碌，有空再约", scores: { independent: 3, casual: 2 } },
+                    { text: "像朋友一样轻松自然", scores: { friendly: 3, relaxed: 2 } },
+                    { text: "轰轰烈烈，惊天动地", scores: { dramatic: 3, passionate: 3 } }
+                ]
+            },
+            {
+                question: "对方送你礼物，你更喜欢？",
+                options: [
+                    { text: "贵重的奢侈品，越贵越好", scores: { materialist: 3, status: 2 } },
+                    { text: "手工制作的，有心意", scores: { sentimental: 3, romantic: 2 } },
+                    { text: "实用的东西，真的能用", scores: { practical: 3, rational: 2 } },
+                    { text: "惊喜就好，什么都喜欢", scores: { easy: 3, flexible: 2 } }
+                ]
+            },
+            {
+                question: "你会因为什么吃醋？",
+                options: [
+                    { text: "对方多看了别人一眼", scores: { jealous: 3, paranoid: 2 } },
+                    { text: "对方夸别人好看/优秀", scores: { insecure: 3, competitive: 2 } },
+                    { text: "对方和异性单独吃饭", scores: { possessive: 3, traditional: 1 } },
+                    { text: "我基本不吃醋，很自信", scores: { confident: 3, secure: 2 } }
+                ]
+            },
+            {
+                question: "恋爱中你最在意对方的？",
+                options: [
+                    { text: "颜值，必须看着顺眼", scores: { visual: 3, superficial: 1 } },
+                    { text: "经济实力，要养得起我", scores: { materialist: 3, realistic: 2 } },
+                    { text: "性格，要合得来", scores: { compatible: 3, deep: 2 } },
+                    { text: "感觉，说不清但很重要", scores: { intuitive: 3, mystical: 2 } }
+                ]
+            },
+            {
+                question: "分手后，你会？",
+                options: [
+                    { text: "痛哭流涕，怀疑人生", scores: { emotional: 3, dependent: 2 } },
+                    { text: "立刻找下一个，无缝衔接", scores: { rebound: 3, avoidant: 2 } },
+                    { text: "删除拉黑，老死不相往来", scores: { decisive: 3, cold: 2 } },
+                    { text: "做朋友，毕竟爱过", scores: { mature: 3, friendly: 2 } }
+                ]
+            },
+            {
+                question: "你认为恋爱中最重要的是？",
+                options: [
+                    { text: "感觉和激情", scores: { passionate: 3, romantic: 2 } },
+                    { text: "信任和忠诚", scores: { loyal: 3, serious: 2 } },
+                    { text: "开心和快乐", scores: { fun: 3, hedonistic: 2 } },
+                    { text: "成长和进步", scores: { growth: 3, mature: 2 } }
+                ]
+            },
+            {
+                question: "对方不记得纪念日，你会？",
+                options: [
+                    { text: "大吵一架，这都能忘？", scores: { angry: 3, demanding: 2 } },
+                    { text: "假装不在乎，其实很失落", scores: { passive: 3, hidden: 2 } },
+                    { text: "直接提醒，下次记得就行", scores: { direct: 3, reasonable: 2 } },
+                    { text: "我也经常忘，无所谓", scores: { casual: 3, forgetful: 2 } }
+                ]
+            },
+            {
+                question: "你会在社交媒体上秀恩爱吗？",
+                options: [
+                    { text: "天天秀！每条动态都要有ta", scores: { exhibitionist: 3, proud: 2 } },
+                    { text: "偶尔秀一下重要时刻", scores: { moderate: 3, balanced: 2 } },
+                    { text: "从来不秀，恋爱是私事", scores: { private: 3, mysterious: 2 } },
+                    { text: "只在小号上秀", scores: { secret: 3, cautious: 2 } }
+                ]
+            },
+            {
+                question: "对于'异性闺蜜'这件事，你的看法是？",
+                options: [
+                    { text: "绝对不行！纯友谊都是骗人的", scores: { jealous: 3, traditional: 2 } },
+                    { text: "可以有，但要保持距离", scores: { reasonable: 3, trust: 2 } },
+                    { text: "我自己就有，很正常啊", scores: { open: 3, confident: 2 } },
+                    { text: "看情况，信任最重要", scores: { flexible: 3, mature: 2 } }
+                ]
+            },
+            {
+                question: "恋爱中你会改变自己吗？",
+                options: [
+                    { text: "会，为了对方我什么都愿意改", scores: { sacrificing: 3, submissive: 2 } },
+                    { text: "不会，爱我就要接受全部的我", scores: { stubborn: 3, confident: 2 } },
+                    { text: "适当调整，求同存异", scores: { compromise: 3, mature: 2 } },
+                    { text: "对方改得更多", scores: { dominant: 3, selfish: 1 } }
+                ]
+            },
+            {
+                question: "你认为谁应该主动？",
+                options: [
+                    { text: "男生必须主动", scores: { traditional: 3, gender: 2 } },
+                    { text: "女生也可以主动", scores: { modern: 3, equal: 2 } },
+                    { text: "谁先喜欢谁主动", scores: { fair: 3, logical: 2 } },
+                    { text: "互相主动，双向奔赴", scores: { balanced: 3, idealistic: 2 } }
+                ]
+            },
+            {
+                question: "发现对方有小缺点，你会？",
+                options: [
+                    { text: "直接说出来，帮ta改正", scores: { direct: 3, perfectionist: 2 } },
+                    { text: "忍着不说，怕伤感情", scores: { passive: 3, avoiding: 2 } },
+                    { text: "用幽默的方式提醒", scores: { humor: 3, smart: 2 } },
+                    { text: "觉得很可爱，不是缺点", scores: { romantic: 3, blind: 1 } }
+                ]
+            },
+            {
+                question: "你对'冷战'的态度是？",
+                options: [
+                    { text: "最讨厌冷战，有话直说", scores: { direct: 3, impatient: 1 } },
+                    { text: "冷战是解决问题的好方法", scores: { avoidant: 3, passive: 2 } },
+                    { text: "看谁先忍不住", scores: { competitive: 3, stubborn: 2 } },
+                    { text: "我会主动破冰", scores: { peacemaker: 3, caring: 2 } }
+                ]
+            },
+            {
+                question: "恋爱中你最害怕失去？",
+                options: [
+                    { text: "失去自由和独立", scores: { independent: 3, fear: 1 } },
+                    { text: "失去对方的爱和关注", scores: { dependent: 3, insecure: 2 } },
+                    { text: "失去面子和尊严", scores: { proud: 3, ego: 2 } },
+                    { text: "失去时间和金钱", scores: { practical: 3, calculating: 2 } }
+                ]
+            },
+            {
+                question: "你认为完美的约会是？",
+                options: [
+                    { text: "烛光晚餐+玫瑰花+惊喜", scores: { romantic: 3, classic: 2 } },
+                    { text: "一起打游戏/看电影/宅家", scores: { casual: 3, relaxed: 2 } },
+                    { text: "说走就走的旅行", scores: { adventurous: 3, spontaneous: 2 } },
+                    { text: "见家长，确定关系", scores: { serious: 3, traditional: 2 } }
+                ]
+            },
+            {
+                question: "最后一题！你对这段测试的感觉是？",
+                options: [
+                    { text: "太准了！这就是我本人！", scores: { accurate: 3, engaged: 2 } },
+                    { text: "好玩，当娱乐了", scores: { fun: 3, casual: 2 } },
+                    { text: "有点意思，看看结果", scores: { curious: 3, open: 2 } },
+                    { text: "终于完了，快给我结果！", scores: { impatient: 3, direct: 2 } }
+                ]
+            }
         ];
 
-        // 因子分组定义
-        const factors = {
-            "躯体化": {
-                items: [1, 4, 12, 27, 40, 42, 48, 49, 52, 53, 56, 58],
-                name: "躯体化",
-                interpretation: "反映身体上的不适症状，如头痛、肌肉酸痛等。高分可能表示存在明显的躯体不适。"
-            },
-            "强迫症状": {
-                items: [3, 9, 10, 28, 38, 45, 46, 51, 55, 65],
-                name: "强迫症状",
-                interpretation: "反映不必要的重复行为、思维或冲动。高分可能表示存在明显的强迫症状。"
-            },
-            "人际关系敏感": {
-                items: [6, 21, 34, 36, 37, 41, 61, 69, 73],
-                name: "人际关系敏感",
-                interpretation: "反映社交互动中的不适感和自卑感。高分可能表示在人际关系方面存在困扰。"
-            },
-            "抑郁": {
-                items: [5, 14, 15, 20, 22, 26, 29, 30, 31, 32, 54, 71, 79],
-                name: "抑郁",
-                interpretation: "反映低落情绪、绝望感和无价值感。高分可能表示存在明显的抑郁症状。"
-            },
-            "焦虑": {
-                items: [2, 17, 23, 33, 39, 57, 72, 78, 80, 86],
-                name: "焦虑",
-                interpretation: "反映过度担忧、紧张和恐惧。高分可能表示存在明显的焦虑症状。"
-            },
-            "敌对": {
-                items: [11, 24, 63, 67, 74, 81],
-                name: "敌对",
-                interpretation: "反映愤怒、易怒和攻击性。高分可能表示存在明显的敌对情绪。"
-            },
-            "恐怖": {
-                items: [13, 25, 47, 50, 70, 75, 82],
-                name: "恐怖",
-                interpretation: "反映对特定情境或物体的恐惧。高分可能表示存在明显的恐怖症状。"
-            },
-            "偏执": {
-                items: [8, 18, 43, 68, 76, 83],
-                name: "偏执",
-                interpretation: "反映猜疑、不信任和被害妄想。高分可能表示存在明显的偏执观念。"
-            },
-            "精神病性": {
-                items: [7, 16, 35, 62, 77, 84, 85, 87, 88, 90],
-                name: "精神病性",
-                interpretation: "反映精神病性症状，如幻觉、妄想和思维障碍。高分可能表示存在精神病性症状。"
-            },
-            "其他": {
-                items: [19, 44, 59, 60, 64, 66, 89],
-                name: "其他（睡眠饮食等）",
-                interpretation: "反映睡眠、饮食和其他方面的问题。高分可能表示存在睡眠或饮食问题。"
-            }
+        // ==================== 全局变量 ====================
+        let currentQuestion = 0;
+        let answers = [];
+        let scores = {
+            attachment: 0,      // 依恋类型
+            passion: 0,         // 热情度
+            rational: 0,        // 理性度
+            anxiety: 0,         // 焦虑程度
+            possessive: 0,      // 占有欲
+            independent: 0,     // 独立性
+            humor: 0,           // 幽默感
+            materialist: 0,     // 物质倾向
+            dominant: 0,        // 主导性
+            insecure: 0,        // 不安全感
+            generous: 0,        // 慷慨度
+            social: 0,          // 社交倾向
+            deep: 0,            // 深度
+            romantic: 0,        // 浪漫度
+            adventurous: 0,     // 冒险精神
+            agreeable: 0,       // 随和度
+            direct: 0,          // 直接性
+            stubborn: 0,        // 固执度
+            jealous: 0,         // 嫉妒心
+            competitive: 0,     // 竞争心
+            verbal: 0,          // 言语表达
+            action: 0,          // 行动力
+            peacemaker: 0,      // 和事佬
+            avoidant: 0,        // 回避型
+            cautious: 0,        // 谨慎度
+            impulsive: 0,       // 冲动性
+            traditional: 0,     // 传统度
+            conservative: 0,    // 保守度
+            intuitive: 0,       // 直觉性
+            dramatic: 0,        // 戏剧性
+            visual: 0,          // 视觉倾向
+            superficial: 0,     // 表面化
+            compatible: 0,      // 兼容性
+            mystical: 0,        // 神秘感
+            emotional: 0,        // 情绪化
+            rebound: 0,         // 反弹倾向
+            decisive: 0,        // 决断力
+            loyal: 0,           // 忠诚度
+            fun: 0,             // 趣味性
+            growth: 0,          // 成长性
+            angry: 0,           // 愤怒倾向
+            demanding: 0,       // 要求度
+            hidden: 0,          // 隐藏情绪
+            reasonable: 0,      // 合理性
+            forgetful: 0,       // 健忘
+            exhibitionist: 0,   // 表现欲
+            proud: 0,           // 自豪感
+            moderate: 0,        // 适度性
+            private: 0,         // 隐私性
+            secret: 0,          // 秘密性
+            open: 0,            // 开放性
+            confident: 0,       // 自信度
+            flexible: 0,        // 灵活性
+            sacrificing: 0,     // 牺牲精神
+            submissive: 0,      // 顺从度
+            selfish: 0,         // 自私度
+            gender: 0,          // 性别观念
+            modern: 0,          // 现代性
+            balanced: 0,        // 平衡度
+            idealistic: 0,      // 理想主义
+            perfectionist: 0,   // 完美主义
+            smart: 0,           // 聪明度
+            blind: 0,           // 盲目性
+            impatient: 0,       // 不耐烦
+            caring: 0,          // 关怀度
+            fear: 0,            // 恐惧感
+            ego: 0,             // 自我
+            practical: 0,       // 实用性
+            calculating: 0,     // 算计
+            classic: 0,         // 经典
+            serious: 0,         // 严肃性
+            engaged: 0,         // 参与度
+            accurate: 0,        // 准确度
+            curious: 0,         // 好奇心
+            double: 2,          // 双重标准
+            equal: 0,           // 平等观念
+            fair: 0,            // 公平感
+            sincere: 0,         // 真诚度
+            excuse: 0,          // 借口
+            generous: 0         // 慷慨
         };
 
-        // 用户数据
-        const userResponses = {
-            currentQuestion: 0,
-            answers: new Array(90).fill(null), // 存储用户对每个问题的回答(1-5分)
-            completed: false,
-            results: null // 存储计算结果
-        };
-
-        // DOM元素
-        const pages = document.querySelectorAll('.page');
-        const introPage = document.getElementById('intro');
-        const testPage = document.getElementById('test');
-        const resultsPage = document.getElementById('results');
-        
-        const startTestBtn = document.getElementById('start-test');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const restartTestBtn = document.getElementById('restart-test');
-        
-        const progressBar = document.getElementById('progress-bar');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const currentQuestionSpan = document.getElementById('current-question');
-        
-        // 结果页元素
-        const totalScoreSpan = document.getElementById('total-score');
-        const totalSymptomIndexSpan = document.getElementById('total-symptom-index');
-        const positiveItemsSpan = document.getElementById('positive-items');
-        const negativeItemsSpan = document.getElementById('negative-items');
-        const interpretationWarningDiv = document.getElementById('interpretation-warning');
-        const factorTableBody = document.getElementById('factor-table').querySelector('tbody');
-        const interpretationDiv = document.getElementById('interpretation');
-
-        // 切换页面
-        function showPage(pageId) {
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
+        // ==================== 初始化 ====================
+        function init() {
+            createBackgroundHearts();
+            loadQuestion();
         }
 
-        // 开始测试
-        startTestBtn.addEventListener('click', () => {
-            showPage('test');
-            showQuestion(userResponses.currentQuestion);
-        });
+        // 创建背景爱心装饰
+        function createBackgroundHearts() {
+            const container = document.getElementById('bgDecoration');
+            const hearts = ['💕', '💖', '💗', '💓', '💞', '💘'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.fontSize = (20 + Math.random() * 30) + 'px';
+                container.appendChild(heart);
+            }
+        }
 
-        // 显示当前题目
-        function showQuestion(index) {
-            const question = questions[index];
-            questionText.textContent = question.text;
-            
-            // 清空选项容器
-            optionsContainer.innerHTML = '';
-            
-            // 创建选项
-            const options = [
-                { value: 1, text: '没有' },
-                { value: 2, text: '很轻' },
-                { value: 3, text: '中等' },
-                { value: 4, text: '偏重' },
-                { value: 5, text: '严重' }
-            ];
-            
-            options.forEach(option => {
-                const optionDiv = document.createElement('div');
-                optionDiv.className = 'option';
-                if (userResponses.answers[index] === option.value) {
-                    optionDiv.classList.add('selected');
-                }
-                
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = 'answer';
-                input.value = option.value;
-                input.id = `option-${option.value}`;
-                input.checked = userResponses.answers[index] === option.value;
-                
-                const label = document.createElement('label');
-                label.htmlFor = `option-${option.value}`;
-                label.textContent = option.text;
-                
-                optionDiv.appendChild(input);
-                optionDiv.appendChild(label);
-                
-                optionDiv.addEventListener('click', () => {
-                    // 移除其他选项的选中状态
-                    document.querySelectorAll('.option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // 添加当前选项的选中状态
-                    optionDiv.classList.add('selected');
-                    
-                    // 选中对应的单选按钮
-                    input.checked = true;
-                    
-                    // 保存答案
-                    userResponses.answers[index] = option.value;
-                });
-                
-                optionsContainer.appendChild(optionDiv);
-            });
+        // ==================== 测试流程控制 ====================
+        function startTest() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('testPage').classList.add('active');
+            currentQuestion = 0;
+            answers = [];
+            resetScores();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            const questionNumber = currentQuestion + 1;
             
             // 更新进度
-            currentQuestionSpan.textContent = index + 1;
-            progressBar.style.width = `${((index + 1) / 90) * 100}%`;
+            document.getElementById('progressText').textContent = `${questionNumber}/25 题`;
+            document.getElementById('progressFill').style.width = `${(questionNumber / 25) * 100}%`;
+            document.getElementById('questionNumber').textContent = `第${questionNumber}题`;
+            document.getElementById('questionText').textContent = question.question;
             
-            // 更新导航按钮状态
-            prevBtn.disabled = index === 0;
-            nextBtn.textContent = index === 89 ? '完成' : '下一题';
+            // 渲染选项
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option.text;
+                btn.onclick = () => selectOption(index);
+                
+                // 如果已有答案，恢复选中状态
+                if (answers[currentQuestion] === index) {
+                    btn.classList.add('selected');
+                }
+                
+                optionsContainer.appendChild(btn);
+            });
+            
+            // 更新按钮状态
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').disabled = answers[currentQuestion] === undefined;
+            
+            // 如果是最后一题，改变按钮文字
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestion === 24) {
+                nextBtn.textContent = '查看结果 🎉';
+            } else {
+                nextBtn.textContent = '下一题 ➡';
+            }
+            
+            // 添加动画
+            document.getElementById('questionCard').classList.add('fade-in');
         }
 
-        // 上一题按钮
-        prevBtn.addEventListener('click', () => {
-            if (userResponses.currentQuestion > 0) {
-                userResponses.currentQuestion--;
-                showQuestion(userResponses.currentQuestion);
-            }
-        });
-
-        // 下一题按钮
-        nextBtn.addEventListener('click', () => {
-            // 检查是否已选择答案
-            if (userResponses.answers[userResponses.currentQuestion] === null) {
-                alert('请选择一个选项');
-                return;
-            }
+        function selectOption(index) {
+            answers[currentQuestion] = index;
             
-            if (userResponses.currentQuestion < 89) {
-                userResponses.currentQuestion++;
-                showQuestion(userResponses.currentQuestion);
+            // 更新UI
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, i) => {
+                btn.classList.toggle('selected', i === index);
+            });
+            
+            // 启用下一题按钮
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 24) {
+                currentQuestion++;
+                loadQuestion();
             } else {
                 // 完成测试，计算结果
-                userResponses.completed = true;
-                calculateResults();
-                displayResults();
-                showPage('results');
+                calculateResult();
+                showResult();
             }
-        });
-
-        // 计算测试结果
-        function calculateResults() {
-            // 计算总分
-            const totalScore = userResponses.answers.reduce((sum, score) => sum + score, 0);
-            
-            // 计算各因子分
-            const factorScores = {};
-            Object.keys(factors).forEach(factorKey => {
-                const factor = factors[factorKey];
-                const factorAnswers = factor.items.map(itemIndex => userResponses.answers[itemIndex - 1]);
-                const factorTotal = factorAnswers.reduce((sum, score) => sum + score, 0);
-                factorScores[factorKey] = {
-                    rawScore: factorTotal,
-                    average: factorTotal / factor.items.length
-                };
-            });
-            
-            // 计算阳性项目数
-            const positiveItems = userResponses.answers.filter(score => score >= 2).length;
-            
-            // 保存结果
-            userResponses.results = {
-                totalScore,
-                totalSymptomIndex: totalScore / 90,
-                positiveItems,
-                negativeItems: 90 - positiveItems,
-                factorScores
-            };
         }
 
-        // 显示测试结果
-        function displayResults() {
-            const results = userResponses.results;
-            
-            // 更新总体评估
-            totalScoreSpan.textContent = results.totalScore;
-            totalSymptomIndexSpan.textContent = results.totalSymptomIndex.toFixed(2);
-            positiveItemsSpan.textContent = results.positiveItems;
-            negativeItemsSpan.textContent = results.negativeItems;
-            
-            // 更新警告信息
-            if (results.totalScore > 160 || results.positiveItems > 43) {
-                interpretationWarningDiv.innerHTML = `
-                    <p><strong>注意：</strong>您的总分(${results.totalScore}分)超过常模标准(160分)，或阳性项目数(${results.positiveItems}项)超过常模标准(43项)，建议进一步关注自身心理健康状况。</p>
-                `;
-            } else {
-                interpretationWarningDiv.innerHTML = `
-                    <p><strong>总体评价：</strong>您的总分(${results.totalScore}分)和阳性项目数(${results.positiveItems}项)在常模范围内，总体心理健康状况良好。</p>
-                `;
+        // ==================== 评分计算 ====================
+        function resetScores() {
+            for (let key in scores) {
+                scores[key] = 0;
             }
-            
-            // 更新因子表格
-            factorTableBody.innerHTML = '';
-            Object.keys(results.factorScores).forEach(factorKey => {
-                const factorScore = results.factorScores[factorKey];
-                const factor = factors[factorKey];
-                
-                const row = document.createElement('tr');
-                
-                const nameCell = document.createElement('td');
-                nameCell.textContent = factor.name;
-                row.appendChild(nameCell);
-                
-                const scoreCell = document.createElement('td');
-                scoreCell.textContent = factorScore.average.toFixed(2);
-                if (factorScore.average > 2) {
-                    scoreCell.style.fontWeight = 'bold';
-                    scoreCell.style.color = '#dc3545';
-                }
-                row.appendChild(scoreCell);
-                
-                const interpretationCell = document.createElement('td');
-                interpretationCell.textContent = factor.interpretation;
-                if (factorScore.average > 2) {
-                    interpretationCell.style.fontWeight = 'bold';
-                }
-                row.appendChild(interpretationCell);
-                
-                factorTableBody.appendChild(row);
-            });
-            
-            // 更新结果解释
-            let interpretation = '';
-            
-            // 各因子解释
-            Object.keys(results.factorScores).forEach(factorKey => {
-                const factorScore = results.factorScores[factorKey].average;
-                const factor = factors[factorKey];
-                
-                if (factorScore > 2) {
-                    interpretation += `<p><strong>${factor.name}</strong> (${factorScore.toFixed(2)}分)：${factor.interpretation}您的得分较高，建议关注。</p>`;
-                }
-            });
-            
-            if (interpretation === '') {
-                interpretation = '<p>您在所有因子上的得分均在正常范围内，表明您当前的心理健康状况良好。</p>';
-            }
-            
-            interpretationDiv.innerHTML = interpretation;
-            
-            // 创建雷达图
-            createRadarChart(results);
         }
 
-        // 创建雷达图
-        function createRadarChart(results) {
-            const ctx = document.getElementById('radar-chart').getContext('2d');
-            
-            const factorNames = Object.keys(factors).map(key => factors[key].name);
-            const factorValues = Object.keys(factors).map(key => results.factorScores[key].average);
-            
-            // 销毁已存在的图表（如果有）
-            if (window.radarChart) {
-                window.radarChart.destroy();
-            }
-            
-            window.radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: factorNames,
-                    datasets: [{
-                        label: '因子分',
-                        data: factorValues,
-                        backgroundColor: 'rgba(74, 144, 226, 0.2)',
-                        borderColor: 'rgba(74, 144, 226, 1)',
-                        pointBackgroundColor: 'rgba(74, 144, 226, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(74, 144, 226, 1)'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 5,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `因子分: ${context.raw.toFixed(2)}`;
-                                }
-                            }
-                        }
+        function calculateResult() {
+            answers.forEach((answerIndex, questionIndex) => {
+                const question = questions[questionIndex];
+                const selectedOption = question.options[answerIndex];
+                
+                // 累加各项分数
+                for (let key in selectedOption.scores) {
+                    if (scores.hasOwnProperty(key)) {
+                        scores[key] += selectedOption.scores[key];
                     }
                 }
             });
+            
+            // 归一化分数（转换为0-100分）
+            for (let key in scores) {
+                scores[key] = Math.min(100, Math.round((scores[key] / 75) * 100));
+            }
         }
 
-        // 重新测试按钮
-        restartTestBtn.addEventListener('click', () => {
-            // 重置用户数据
-            userResponses.currentQuestion = 0;
-            userResponses.answers = new Array(90).fill(null);
-            userResponses.completed = false;
-            userResponses.results = null;
+        // ==================== 结果分析 ====================
+        function getResultType() {
+            const attachment = scores.attachment;
+            const anxiety = scores.anxiety;
+            const independent = scores.independent;
+            const passionate = scores.passion;
+            const rational = scores.rational;
             
-            // 返回测试页
-            showPage('test');
-            showQuestion(0);
-        });
+            // 依恋类型判断
+            if (anxiety > 60 && independent < 40) {
+                return {
+                    type: '焦虑型依恋',
+                    subtype: '黏人小妖精',
+                    icon: '🌸'
+                };
+            } else if (independent > 60 && anxiety < 40) {
+                return {
+                    type: '回避型依恋',
+                    subtype: '独立单身贵族',
+                    icon: '🐱'
+                };
+            } else if (anxiety < 40 && independent > 40) {
+                return {
+                    type: '安全型依恋',
+                    subtype: '成熟稳重派',
+                    icon: '🌟'
+                };
+            }
+            
+            // 恋爱体质判断
+            if (passionate > 70) {
+                return {
+                    type: '热情恋爱脑',
+                    subtype: '为爱痴狂型',
+                    icon: '🔥'
+                };
+            } else if (rational > 70) {
+                return {
+                    type: '理智分析师',
+                    subtype: '人间清醒型',
+                    icon: '🧠'
+                };
+            } else if (scores.fun > 60) {
+                return {
+                    type: '随缘吃瓜群众',
+                    subtype: '快乐至上型',
+                    icon: '🍿'
+                };
+            } else if (scores.possessive > 60) {
+                return {
+                    type: '霸道总裁范',
+                    subtype: '超强占有型',
+                    icon: '👑'
+                };
+            } else {
+                return {
+                    type: '温柔治愈系',
+                    subtype: '暖心小太阳',
+                    icon: '☀️'
+                };
+            }
+        }
+
+        function getPersonalityTraits() {
+            const traits = [];
+            
+            if (scores.humor > 60) traits.push({ text: '幽默大师', icon: '😂' });
+            if (scores.romantic > 60) traits.push({ text: '浪漫至死', icon: '🌹' });
+            if (scores.direct > 60) traits.push({ text: '直球选手', icon: '🏏' });
+            if (scores.stubborn > 60) traits.push({ text: '倔强青铜', icon: '🐂' });
+            if (scores.generous > 60) traits.push({ text: '大方豪爽', icon: '💰' });
+            if (scores.jealous > 60) traits.push({ text: '醋坛子', icon: '🍶' });
+            if (scores.materialist > 60) traits.push({ text: '现实主义者', icon: '💳' });
+            if (scores.adventurous > 60) traits.push({ text: '冒险家', icon: '🎢' });
+            
+            return traits.slice(0, 4);
+        }
+
+        function getOccupationType() {
+            if (scores.dominant > 60 && scores.possessive > 60) {
+                return { name: '霸道总裁', desc: '你在恋爱中喜欢掌控一切，对方的行踪、社交都要了如指掌。虽然有点强势，但也说明你很在乎！' };
+            } else if (scores.independent > 60 && scores.rational > 60) {
+                return { name: '佛系青年', desc: '你认为恋爱只是生活的一部分，不会为了爱情失去自我。这种态度很酷，但也要注意别太冷漠哦！' };
+            } else if (scores.passionate > 60 && scores.romantic > 60) {
+                return { name: '深情恋人', desc: '你一旦爱上就全心全意，愿意为对方付出一切。这种专情很珍贵，但也要学会保护自己！' };
+            } else if (scores.fun > 60 && scores.casual > 60) {
+                return { name: '快乐玩家', desc: '你把恋爱当游戏，开心最重要！这种轻松的态度让人舒服，但也要认真对待感情哦！' };
+            } else {
+                return { name: '温暖伴侣', desc: '你温柔体贴，善解人意，是很多人理想的恋爱对象。继续保持这份温暖吧！' };
+            }
+        }
+
+        function getAttachmentAdvice() {
+            const anxiety = scores.anxiety;
+            const independent = scores.independent;
+            
+            if (anxiety > 60) {
+                return {
+                    title: '⚠️ 焦虑型依恋预警',
+                    content: '你在恋爱中容易患得患失，需要对方不断的确认和安全感。建议：学会独立，培养自己的兴趣爱好，不要把全部注意力都放在对方身上。记住：真正的爱不需要你时刻证明！',
+                    color: '#e74c3c'
+                };
+            } else if (independent > 60) {
+                return {
+                    title: '🧊 回避型依恋提醒',
+                    content: '你很享受独立空间，但可能会让对方觉得冷漠。建议：适当表达情感，学会依赖和被依赖，亲密关系需要适度的脆弱和分享！',
+                    color: '#3498db'
+                };
+            } else {
+                return {
+                    title: '✅ 安全型依恋优势',
+                    content: '恭喜！你拥有健康的依恋模式，既能享受亲密，也能保持独立。继续保持这种平衡，你会拥有长久稳定的幸福关系！',
+                    color: '#27ae60'
+                };
+            }
+        }
+
+        // ==================== 结果展示 ====================
+        function showResult() {
+            document.getElementById('testPage').classList.remove('active');
+            document.getElementById('resultPage').classList.add('active');
+            
+            const result = getResultType();
+            const traits = getPersonalityTraits();
+            const occupation = getOccupationType();
+            const advice = getAttachmentAdvice();
+            
+            // 计算总分
+            const totalScore = Math.round(
+                (scores.passionate + scores.romantic + scores.loyal + scores.fun) / 4
+            );
+            
+            // 动画显示分数
+            animateScore(totalScore);
+            
+            // 显示结果类型
+            document.getElementById('resultType').textContent = `${result.icon} ${result.type}`;
+            document.getElementById('resultSubtitle').textContent = result.subtype;
+            
+            // 生成详细结果
+            const resultDetails = document.getElementById('resultDetails');
+            resultDetails.innerHTML = `
+                <!-- 基本信息卡片 -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <span class="detail-icon">📊</span>
+                        综合评分
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-bar">
+                            <div class="chart-label">
+                                <span>恋爱热情度</span>
+                                <span><strong>${scores.passionate}</strong>/100</span>
+                            </div>
+                            <div class="chart-bar-bg">
+                                <div class="chart-bar-fill" style="width: ${scores.passionate}%; background: linear-gradient(90deg, #ff6b9d, #ffa502);">
+                                    ${scores.passionate}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">
+                                <span>理性程度</span>
+                                <span><strong>${scores.rational}</strong>/100</span>
+                            </div>
+                            <div class="chart-bar-bg">
+                                <div class="chart-bar-fill" style="width: ${scores.rational}%; background: linear-gradient(90deg, #4facfe, #00f2fe);">
+                                    ${scores.rational}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">
+                                <span>占有欲指数</span>
+                                <span><strong>${scores.possessive}</strong>/100</span>
+                            </div>
+                            <div class="chart-bar-bg">
+                                <div class="chart-bar-fill" style="width: ${scores.possessive}%; background: linear-gradient(90deg, #f093fb, #f5576c);">
+                                    ${scores.possessive}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-label">
+                                <span>独立指数</span>
+                                <span><strong>${scores.independent}</strong>/100</span>
+                            </div>
+                            <div class="chart-bar-bg">
+                                <div class="chart-bar-fill" style="width: ${scores.independent}%; background: linear-gradient(90deg, #43e97b, #38f9d7);">
+                                    ${scores.independent}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 人格特质卡片 -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <span class="detail-icon">🎭</span>
+                        人格特质标签
+                    </div>
+                    <div class="trait-tags">
+                        ${traits.map(trait => `<span class="trait-tag">${trait.icon} ${trait.text}</span>`).join('')}
+                    </div>
+                </div>
+
+                <!-- 恋爱职业卡片 -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <span class="detail-icon">💼</span>
+                        你的"恋爱职业"
+                    </div>
+                    <div class="detail-content">
+                        <h3 style="color: var(--primary-color); margin-bottom: 10px;">${occupation.name}</h3>
+                        <p>${occupation.desc}</p>
+                    </div>
+                </div>
+
+                <!-- 依恋类型分析 -->
+                <div class="detail-card" style="border-left: 4px solid ${advice.color};">
+                    <div class="detail-title" style="color: ${advice.color};">
+                        <span class="detail-icon">🔗</span>
+                        ${advice.title}
+                    </div>
+                    <div class="detail-content">
+                        <p>${advice.content}</p>
+                    </div>
+                </div>
+
+                <!-- 专业建议 -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <span class="detail-icon">💡</span>
+                        专家建议
+                    </div>
+                    <div class="detail-content">
+                        <p><strong>🌟 优势：</strong>${getStrengths()}</p>
+                        <p style="margin-top: 10px;"><strong>⚠️ 注意：</strong>${getWarnings()}</p>
+                        <p style="margin-top: 10px;"><strong>🎯 改进方向：</strong>${getSuggestions()}</p>
+                    </div>
+                </div>
+
+                <!-- 趣味解读 -->
+                <div class="detail-card" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    <div class="detail-title">
+                        <span class="detail-icon">🤪</span>
+                        神评论时间
+                    </div>
+                    <div class="detail-content">
+                        <p style="font-style: italic; color: var(--text-dark);">
+                            "${getFunnyComment()}"
+                        </p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-light);">
+                            —— 来自网络热心群众的真实评价
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function animateScore(targetScore) {
+            const scoreElement = document.getElementById('resultScore');
+            let currentScore = 0;
+            const increment = targetScore / 50;
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.round(currentScore);
+            }, 30);
+        }
+
+        function getStrengths() {
+            const strengths = [];
+            if (scores.passionate > 60) strengths.push('热情主动，敢于表达爱意');
+            if (scores.romantic > 60) strengths.push('懂得制造惊喜和浪漫');
+            if (scores.loyal > 60) strengths.push('专一忠诚，值得信赖');
+            if (scores.humor > 60) strengths.push('幽默风趣，相处轻松愉快');
+            if (scores.independent > 60) strengths.push('独立自信，有自己的生活');
+            
+            return strengths.length > 0 ? strengths.join('；') : '你是一个独特的个体！';
+        }
+
+        function getWarnings() {
+            const warnings = [];
+            if (scores.anxiety > 70) warnings.push('太过依赖可能会给对方压力');
+            if (scores.possessive > 70) warnings.push('控制欲太强容易吓跑对象');
+            if (scores.jealous > 70) warnings.push('吃醋过度会影响关系');
+            if (scores.impulsive > 70) warnings.push('冲动行事可能后悔');
+            
+            return warnings.length > 0 ? warnings.join('；') + '。' : '继续保持现在的状态就很好！';
+        }
+
+        function getSuggestions() {
+            if (scores.anxiety > 60) {
+                return '学会自我安抚，培养独立兴趣，不要把安全感全部寄托在伴侣身上。';
+            } else if (scores.possessive > 60) {
+                return '给对方适当空间，信任是关系的基石。试着放松一点，爱情不是抓得越紧越好。';
+            } else if (scores.rational > 70) {
+                return '偶尔也要感性一点，爱情不是逻辑题，太理性会少了很多乐趣哦！';
+            } else {
+                return '保持真诚和热情，同时也要学会沟通和妥协。爱情需要经营，也需要智慧！';
+            }
+        }
+
+        function getFunnyComment() {
+            const comments = [
+                '这测试结果简直就是在我家装了监控！',
+                '我妈问我为什么跪着看手机...',
+                '建议把这结果刻在墓碑上，让后人引以为戒',
+                '这也太准了吧！我怀疑你在偷窥我的生活',
+                '看完结果，我觉得我还是单身比较安全',
+                '这测试做得我想给开发者打钱！',
+                '我对象看了都说：这就是你本人！',
+                '建议纳入婚前必测项目，拯救无数单身狗',
+                '做完这个测试，我终于知道为什么单身了...',
+                '这结果如果发朋友圈，估计会被拉黑'
+            ];
+            return comments[Math.floor(Math.random() * comments.length)];
+        }
+
+        // ==================== 分享功能 ====================
+        function shareResult() {
+            const resultType = document.getElementById('resultType').textContent;
+            const resultScore = document.getElementById('resultScore').textContent;
+            const shareText = `我刚做了恋爱体质测试，结果是：${resultType}，得分${resultScore}分！快来测测你是什么恋爱型人格！`;
+            const shareUrl = window.location.href;
+            
+            document.getElementById('shareLink').textContent = `${shareUrl}?result=${encodeURIComponent(shareText)}`;
+            document.getElementById('shareModal').classList.add('active');
+            
+            // 尝试使用原生分享API
+            if (navigator.share) {
+                navigator.share({
+                    title: '恋爱体质测试结果',
+                    text: shareText,
+                    url: shareUrl
+                }).catch(err => console.log('分享失败:', err));
+            }
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        // ==================== 重新测试 ====================
+        function retryTest() {
+            document.getElementById('resultPage').classList.remove('active');
+            document.getElementById('homePage').classList.remove('hidden');
+            currentQuestion = 0;
+            answers = [];
+            resetScores();
+        }
+
+        // ==================== 页面加载完成 ====================
+        window.onload = init;
+
+        // 点击模态框背景关闭
+        document.getElementById('shareModal').onclick = function(e) {
+            if (e.target === this) {
+                closeShareModal();
+            }
+        };
     </script>
 </body>
 </html>
